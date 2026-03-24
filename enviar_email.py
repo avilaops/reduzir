@@ -31,7 +31,7 @@ html_part = MIMEText(html_content, 'html', 'utf-8')
 msg.attach(html_part)
 
 # Anexar dados cadastrais
-cadastro_file = "dados-cadastrais-JLA.pdf"
+cadastro_file = "Dados-cadastrais-JLA.pdf"
 if os.path.exists(cadastro_file):
     with open(cadastro_file, 'rb') as f:
         pdf_attachment = MIMEApplication(f.read(), _subtype='pdf')
