@@ -2,7 +2,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
-from email.mime.image import MIMEImage
 import os
 
 # Configurações do servidor SMTP
@@ -30,16 +29,6 @@ with open('email-catalogo.html', 'r', encoding='utf-8') as f:
 # Anexar HTML
 html_part = MIMEText(html_content, 'html', 'utf-8')
 msg.attach(html_part)
-
-# Anexar logo como imagem inline
-logo_file = "image.png"
-if os.path.exists(logo_file):
-    with open(logo_file, 'rb') as f:
-        logo_img = MIMEImage(f.read())
-        logo_img.add_header('Content-ID', '<logo>')
-        logo_img.add_header('Content-Disposition', 'inline', filename=logo_file)
-        msg.attach(logo_img)
-    print(f"✓ Logo anexada: {logo_file}")
 
 # Anexar PDF se existir
 pdf_file = "Catalogo-JLA-reduzido.pdf"
