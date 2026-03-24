@@ -10,11 +10,19 @@ SMTP_PORT = 587  # Porta TLS padrão (ou 465 para SSL)
 EMAIL_REMETENTE = "vendas01@jlaimportadora.com.br"
 SENHA = "03021731Lch*"
 
-# Emails de destino
-EMAILS_DESTINO = [
-    "nicolasrosaab@gmail.com",
-    "vendas@jlaimportadora.com.br"
-]
+# Ler emails da lista
+print("Lendo lista de emails...")
+with open('emails.txt', 'r', encoding='utf-8') as f:
+    EMAILS_DESTINO = [email.strip() for email in f.readlines() if email.strip()]
+
+print(f"Encontrados {len(EMAILS_DESTINO)} email(s) na lista:")
+for email in EMAILS_DESTINO:
+    print(f"  - {email}")
+
+resposta = input("\nDeseja enviar para todos esses emails? (s/n): ")
+if resposta.lower() != 's':
+    print("Envio cancelado.")
+    exit()
 
 # Criar mensagem
 msg = MIMEMultipart('alternative')
