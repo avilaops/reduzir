@@ -35,7 +35,7 @@ python enviar_email.py
 - PyMuPDF (fitz)
 - Pillow
 
-## JLA Importadora
+## JLA Importadora de Vedações e Rolamentos Ltda
 
 Retentores • Vedações • Rolamentos • Correias
 
