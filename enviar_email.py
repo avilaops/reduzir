@@ -15,14 +15,10 @@ print("Lendo lista de emails...")
 with open('emails.txt', 'r', encoding='utf-8') as f:
     EMAILS_DESTINO = [email.strip() for email in f.readlines() if email.strip()]
 
-print(f"Encontrados {len(EMAILS_DESTINO)} email(s) na lista:")
+print(f"Preparando envio para {len(EMAILS_DESTINO)} email(s):")
 for email in EMAILS_DESTINO:
     print(f"  - {email}")
-
-resposta = input("\nDeseja enviar para todos esses emails? (s/n): ")
-if resposta.lower() != 's':
-    print("Envio cancelado.")
-    exit()
+print()
 
 # Criar mensagem
 msg = MIMEMultipart('alternative')
