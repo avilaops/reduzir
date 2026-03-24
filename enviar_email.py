@@ -30,16 +30,18 @@ with open('email-catalogo.html', 'r', encoding='utf-8') as f:
 html_part = MIMEText(html_content, 'html', 'utf-8')
 msg.attach(html_part)
 
-# Anexar PDF se existir
-pdf_file = "Catalogo-JLA-completo.pdf"
-if os.path.exists(pdf_file):
-    with open(pdf_file, 'rb') as f:
+# Anexar dados cadastrais
+cadastro_file = "dados-cadastrais-JLA.pdf"
+if os.path.exists(cadastro_file):
+    with open(cadastro_file, 'rb') as f:
         pdf_attachment = MIMEApplication(f.read(), _subtype='pdf')
-        pdf_attachment.add_header('Content-Disposition', 'attachment', filename=pdf_file)
+        pdf_attachment.add_header('Content-Disposition', 'attachment', filename=cadastro_file)
         msg.attach(pdf_attachment)
-    print(f"✓ PDF anexado: {pdf_file}")
+    print(f"✓ Anexado: {cadastro_file}")
 else:
-    print(f"⚠ PDF não encontrado: {pdf_file}")
+    print(f"⚠ Arquivo não encontrado: {cadastro_file}")
+
+print("✓ Email preparado (catálogo disponível via link de download)")
 
 # Enviar email
 print(f"\nEnviando email para {', '.join(EMAILS_DESTINO)}...")
