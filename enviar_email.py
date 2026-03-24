@@ -15,58 +15,75 @@ print("Lendo lista de emails...")
 with open('emails.txt', 'r', encoding='utf-8') as f:
     EMAILS_DESTINO = [email.strip() for email in f.readlines() if email.strip()]
 
-print(f"Preparando envio para {len(EMAILS_DESTINO)} email(s):")
-for email in EMAILS_DESTINO:
-    print(f"  - {email}")
+print(f"Preparando envio individual para {len(EMAILS_DESTINO)} email(s)")
 print()
-
-# Criar mensagem
-msg = MIMEMultipart('alternative')
-msg['From'] = EMAIL_REMETENTE
-msg['To'] = ", ".join(EMAILS_DESTINO)
-msg['Subject'] = "Catálogo JLA Importadora - Retentores, Vedações, Rolamentos e Correias"
 
 # Ler o HTML do email
 with open('email-catalogo.html', 'r', encoding='utf-8') as f:
     html_content = f.read()
 
-# Anexar HTML
-html_part = MIMEText(html_content, 'html', 'utf-8')
-msg.attach(html_part)
-
-# Anexar dados cadastrais
+# Anexar dados cadastrais uma vez para reutilizar
 cadastro_file = "Dados-cadastrais-JLA.pdf"
+cadastro_data = None
 if os.path.exists(cadastro_file):
     with open(cadastro_file, 'rb') as f:
-        pdf_attachment = MIMEApplication(f.read(), _subtype='pdf')
-        pdf_attachment.add_header('Content-Disposition', 'attachment', filename=cadastro_file)
-        msg.attach(pdf_attachment)
-    print(f"✓ Anexado: {cadastro_file}")
+        cadastro_data = f.read()
+    print(f"✓ Arquivo pronto: {cadastro_file}")
 else:
     print(f"⚠ Arquivo não encontrado: {cadastro_file}")
 
 print("✓ Email preparado (catálogo disponível via link de download)")
+print()
 
-# Enviar email
-print(f"\nEnviando email para {', '.join(EMAILS_DESTINO)}...")
-print(f"Servidor: {SMTP_SERVER}:{SMTP_PORT}")
-
+# Conectar ao servidor SMTP uma vez
+print(f"Conectando ao servidor {SMTP_SERVER}:{SMTP_PORT}...")
 try:
-    # Conectar ao servidor SMTP
     server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-    server.starttls()  # Iniciar criptografia TLS
-    
-    # Fazer login
+    server.starttls()
     print("Autenticando...")
     server.login(EMAIL_REMETENTE, SENHA)
+    print("✓ Conectado com sucesso\n")
     
-    # Enviar email
-    print("Enviando...")
-    server.send_message(msg)
+    # Enviar para cada destinatário individualmente
+    enviados = 0
+    erros = 0
+    
+    for email_destino in EMAILS_DESTINO:
+        try:
+            # Criar mensagem individual
+            msg = MIMEMultipart('alternative')
+            msg['From'] = EMAIL_REMETENTE
+            msg['To'] = email_destino
+            msg['Subject'] = "Catálogo JLA Importadora - Retentores, Vedações, Rolamentos e Correias"
+            
+            # Anexar HTML
+            html_part = MIMEText(html_content, 'html', 'utf-8')
+            msg.attach(html_part)
+            
+            # Anexar dados cadastrais se disponível
+            if cadastro_data:
+                pdf_attachment = MIMEApplication(cadastro_data, _subtype='pdf')
+                pdf_attachment.add_header('Content-Disposition', 'attachment', filename=cadastro_file)
+                msg.attach(pdf_attachment)
+            
+            # Enviar
+            print(f"Enviando para {email_destino}...", end=' ')
+            server.send_message(msg)
+            print("✓")
+            enviados += 1
+            
+        except Exception as e:
+            print(f"✗ Erro: {e}")
+            erros += 1
+    
     server.quit()
     
-    print(f"\n✓ Email enviado com sucesso para {', '.join(EMAILS_DESTINO)}!")
-    print(f"✓ Assunto: {msg['Subject']}")
+    print(f"\n{'='*60}")
+    print(f"✓ Envio concluído!")
+    print(f"  Enviados com sucesso: {enviados}")
+    if erros > 0:
+        print(f"  Erros: {erros}")
+    print(f"{'='*60}")
     
 except smtplib.SMTPAuthenticationError:
     print("\n✗ Erro de autenticação. Verifique o email e senha.")
