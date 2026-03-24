@@ -31,13 +31,15 @@ html_part = MIMEText(html_content, 'html', 'utf-8')
 msg.attach(html_part)
 
 # Anexar PDF se existir
-pdf_file = "Catalogo-JLA-reduzido.pdf"
+pdf_file = "Catalogo-JLA-completo.pdf"
 if os.path.exists(pdf_file):
     with open(pdf_file, 'rb') as f:
         pdf_attachment = MIMEApplication(f.read(), _subtype='pdf')
         pdf_attachment.add_header('Content-Disposition', 'attachment', filename=pdf_file)
         msg.attach(pdf_attachment)
     print(f"✓ PDF anexado: {pdf_file}")
+else:
+    print(f"⚠ PDF não encontrado: {pdf_file}")
 
 # Enviar email
 print(f"\nEnviando email para {', '.join(EMAILS_DESTINO)}...")
